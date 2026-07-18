@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>星环塔罗</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="scene"></canvas>
+
+      <section class="hud hud-left" aria-live="polite">
+        <p class="eyebrow">Arcana Orbit</p>
+        <h1>星环塔罗</h1>
+        <p class="status-line" id="modeLabel">等待初始化</p>
+      </section>
+
+      <section class="hud camera-panel">
+        <video id="camera" autoplay playsinline muted></video>
+        <div class="camera-meta">
+          <span id="cameraStatus">等待授权</span>
+          <span id="gestureStatus">未检测</span>
+        </div>
+      </section>
+
+      <section class="card-detail hidden" id="cardDetail" aria-live="polite">
+        <p class="eyebrow" id="cardArcana">Major Arcana</p>
+        <h2 id="cardName">The Fool</h2>
+        <p class="orientation" id="cardOrientation">正位</p>
+        <div class="keyword-row" id="cardKeywords"></div>
+        <div class="meaning-block">
+          <span>正位</span>
+          <p id="uprightMeaning"></p>
+        </div>
+        <div class="meaning-block">
+          <span>逆位</span>
+          <p id="reversedMeaning"></p>
+        </div>
+        <p class="interpretation" id="shortInterpretation"></p>
+      </section>
+
+      <button class="reset-button hidden" id="resetButton" type="button">重新洗牌</button>
+
+      <div class="permission-screen" id="permissionScreen">
+        <div class="permission-content">
+          <p class="eyebrow">Camera Gesture Demo</p>
+          <h2>用手掌唤醒牌阵</h2>
+          <p>授权摄像头后，伸出一根手指控制洗牌，左偏逆时针，右偏顺时针，握拳停止。</p>
+          <button id="startButton" type="button">启动摄像头</button>
+          <p class="permission-note" id="permissionNote"></p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
