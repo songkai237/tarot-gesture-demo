@@ -31,8 +31,21 @@ let mode: SceneMode = "loading";
 let handTracking: HandTracking | null = null;
 let lastGestureName = "未检测";
 let revealTimer = 0;
-let reshufflePrimed = false;
 let returnInProgress = false;
+let returnGesture: ReturnGestureState = createReturnGestureState();
+
+const openPalmHoldMs = 300;
+const fistHoldMs = 600;
+const returnGestureTimeoutMs = 3000;
+const returnGestureMaxVelocity = 0.28;
+
+type ReturnGesturePhase = "idle" | "priming_open_palm" | "awaiting_open_exit" | "awaiting_fist" | "holding_fist";
+
+type ReturnGestureState = {
+  phase: ReturnGesturePhase;
+  startedAt: number;
+  fistStartedAt: number;
+};
 
 setMode("loading");
 
@@ -129,7 +142,7 @@ function triggerDraw(): void {
 
 function resetReading(): void {
   window.clearTimeout(revealTimer);
-  reshufflePrimed = false;
+  returnGesture = createReturnGestureState();
 
   if (mode === "revealed") {
     startReturnAnimation();
@@ -154,7 +167,7 @@ function startReturnAnimation(): void {
 }
 
 function finishResetReading(): void {
-  reshufflePrimed = false;
+  returnGesture = createReturnGestureState();
   returnInProgress = false;
   scene.reset();
   cardDetail.classList.add("hidden");
@@ -186,19 +199,83 @@ function showCardDetail(drawn: DrawnCard): void {
 }
 
 function handleRevealedGesture(gesture: GestureFrame): void {
-  if (gesture.name === "open_palm" && gesture.confidence > 0.76) {
-    reshufflePrimed = true;
-    gestureStatus.textContent = "张掌待重洗";
-    modeLabel.textContent = "握拳放回当前卡牌";
+  const now = performance.now();
+  const isOpenPalm = gesture.name === "open_palm" && gesture.confidence > 0.76;
+  const isStillFist = gesture.name === "fist" && gesture.confidence > 0.86 && Math.abs(gesture.velocityX) < returnGestureMaxVelocity;
+
+  if (returnGesture.phase !== "idle" && now - returnGesture.startedAt > returnGestureTimeoutMs) {
+    cancelReturnGesture("重洗确认已取消");
     return;
   }
 
-  if (reshufflePrimed && gesture.name === "fist") {
+  if (returnGesture.phase === "idle") {
+    if (isOpenPalm) {
+      returnGesture = { phase: "priming_open_palm", startedAt: now, fistStartedAt: 0 };
+      gestureStatus.textContent = "张掌确认中";
+    } else {
+      gestureStatus.textContent = "重洗：张掌后握拳";
+    }
+    return;
+  }
+
+  if (returnGesture.phase === "priming_open_palm") {
+    if (!isOpenPalm) {
+      cancelReturnGesture();
+      return;
+    }
+
+    if (now - returnGesture.startedAt >= openPalmHoldMs) {
+      returnGesture.phase = "awaiting_open_exit";
+      gestureStatus.textContent = "握拳并停住以放回";
+      modeLabel.textContent = "握拳确认放回当前卡牌";
+    } else {
+      gestureStatus.textContent = "张掌确认中";
+    }
+    return;
+  }
+
+  if (returnGesture.phase === "awaiting_open_exit") {
+    if (!isOpenPalm) {
+      returnGesture.phase = "awaiting_fist";
+    }
+    gestureStatus.textContent = "握拳并停住以放回";
+    return;
+  }
+
+  if (returnGesture.phase === "awaiting_fist") {
+    if (isStillFist) {
+      returnGesture.phase = "holding_fist";
+      returnGesture.fistStartedAt = now;
+      gestureStatus.textContent = "确认放回中";
+    } else {
+      gestureStatus.textContent = "握拳并停住以放回";
+    }
+    return;
+  }
+
+  if (!isStillFist) {
+    returnGesture.phase = "awaiting_fist";
+    returnGesture.fistStartedAt = 0;
+    gestureStatus.textContent = "握拳并停住以放回";
+    return;
+  }
+
+  if (now - returnGesture.fistStartedAt >= fistHoldMs) {
     resetReading();
     return;
   }
 
-  gestureStatus.textContent = reshufflePrimed ? "等待握拳" : "重洗：张掌后握拳";
+  gestureStatus.textContent = "确认放回中";
+}
+
+function cancelReturnGesture(status = "重洗：张掌后握拳"): void {
+  returnGesture = createReturnGestureState();
+  gestureStatus.textContent = status;
+  modeLabel.textContent = "张掌后握拳放回卡牌，或点击按钮重新洗牌";
+}
+
+function createReturnGestureState(): ReturnGestureState {
+  return { phase: "idle", startedAt: 0, fistStartedAt: 0 };
 }
 
 function setCameraStatus(status: CameraStatus): void {
@@ -235,7 +312,7 @@ function setMode(nextMode: SceneMode): void {
   modeLabel.textContent = labels[nextMode];
 
   if (nextMode === "revealed") {
-    reshufflePrimed = false;
+    returnGesture = createReturnGestureState();
     gestureStatus.textContent = "重洗：张掌后握拳";
   }
 }

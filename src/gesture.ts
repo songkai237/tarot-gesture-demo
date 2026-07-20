@@ -14,7 +14,6 @@ export class GestureRecognizer {
   private lastPalmX = 0.5;
   private lastTime = performance.now();
   private smoothedVelocity = 0;
-  private lastFistAt = 0;
 
   update(landmarks: Landmark[], now = performance.now()): GestureFrame {
     const palm = getPalmCenter(landmarks);
@@ -27,15 +26,12 @@ export class GestureRecognizer {
     const openScore = getOpenPalmScore(landmarks);
     const fistScore = getFistScore(landmarks);
     const pointGesture = getPointGesture(landmarks);
-    const canTriggerFist = now - this.lastFistAt > 1500;
-
     let name: GestureName = "none";
     let confidence = Math.max(openScore, fistScore, pointGesture.confidence);
 
-    if (fistScore >= 0.86 && canTriggerFist) {
+    if (fistScore >= 0.86) {
       name = "fist";
       confidence = fistScore;
-      this.lastFistAt = now;
     } else if (pointGesture.confidence >= 0.78) {
       name = pointGesture.name;
       confidence = pointGesture.confidence;
@@ -56,7 +52,6 @@ export class GestureRecognizer {
     this.lastPalmX = 0.5;
     this.lastTime = performance.now();
     this.smoothedVelocity = 0;
-    this.lastFistAt = 0;
   }
 }
 
