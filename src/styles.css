@@ -183,6 +183,25 @@ h1 {
   margin-top: 14px;
 }
 
+.detail-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 247, 231, 0.12);
+}
+
+.detail-section .meaning-block + .meaning-block {
+  margin-top: 14px;
+}
+
+.section-label {
+  margin: 0;
+  color: #8ce1db;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .meaning-block span {
   color: #f5d079;
   font-size: 12px;
@@ -197,9 +216,15 @@ h1 {
 }
 
 .interpretation {
-  margin-top: 18px;
+  margin-top: 8px;
   color: #fff3cf;
   font-weight: 700;
+}
+
+.advice {
+  margin: 10px 0 0;
+  color: rgba(255, 247, 231, 0.83);
+  line-height: 1.65;
 }
 
 .reset-button {

@@ -16,6 +16,18 @@ export type TarotCard = {
   shortInterpretation: string;
 };
 
+export type OrientationReading = {
+  upright: string;
+  reversed: string;
+};
+
+export type TarotDetail = {
+  symbolism: string;
+  love: OrientationReading;
+  career: OrientationReading;
+  advice: OrientationReading;
+};
+
 export type DrawnCard = {
   card: TarotCard;
   orientation: CardOrientation;

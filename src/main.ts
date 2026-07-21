@@ -1,5 +1,6 @@
 import "./styles.css";
 import { HandTracking } from "./handTracking";
+import { tarotDetails } from "./tarotDetails";
 import { drawCard, orientationLabel, tarotDeck } from "./tarotData";
 import { TarotScene } from "./tarotScene";
 import type { CameraStatus, DrawnCard, GestureFrame, SceneMode } from "./types";
@@ -18,8 +19,12 @@ const cardArcana = getElement<HTMLElement>("cardArcana");
 const cardName = getElement<HTMLElement>("cardName");
 const cardOrientation = getElement<HTMLElement>("cardOrientation");
 const cardKeywords = getElement<HTMLElement>("cardKeywords");
+const symbolism = getElement<HTMLElement>("symbolism");
 const uprightMeaning = getElement<HTMLElement>("uprightMeaning");
 const reversedMeaning = getElement<HTMLElement>("reversedMeaning");
+const loveMeaning = getElement<HTMLElement>("loveMeaning");
+const careerMeaning = getElement<HTMLElement>("careerMeaning");
+const adviceMeaning = getElement<HTMLElement>("adviceMeaning");
 const shortInterpretation = getElement<HTMLElement>("shortInterpretation");
 
 const scene = new TarotScene({
@@ -178,6 +183,7 @@ function finishResetReading(): void {
 
 function showCardDetail(drawn: DrawnCard): void {
   const { card, orientation } = drawn;
+  const detail = tarotDetails[card.id];
   cardArcana.textContent = card.arcana === "major" ? "Major Arcana" : `${card.suit ?? "Minor"} Arcana`;
   cardName.textContent = card.name;
   cardOrientation.textContent = orientationLabel(orientation);
@@ -190,6 +196,10 @@ function showCardDetail(drawn: DrawnCard): void {
   );
   uprightMeaning.textContent = card.uprightMeaning;
   reversedMeaning.textContent = card.reversedMeaning;
+  symbolism.textContent = detail.symbolism;
+  loveMeaning.textContent = detail.love[orientation];
+  careerMeaning.textContent = detail.career[orientation];
+  adviceMeaning.textContent = detail.advice[orientation];
   shortInterpretation.textContent =
     orientation === "upright"
       ? card.shortInterpretation

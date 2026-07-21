@@ -28,6 +28,13 @@
         <h2 id="cardName">The Fool</h2>
         <p class="orientation" id="cardOrientation">正位</p>
         <div class="keyword-row" id="cardKeywords"></div>
+        <div class="detail-section">
+          <p class="section-label">牌义</p>
+          <div class="meaning-block">
+            <span>象征意象</span>
+            <p id="symbolism"></p>
+          </div>
+        </div>
         <div class="meaning-block">
           <span>正位</span>
           <p id="uprightMeaning"></p>
@@ -36,7 +43,22 @@
           <span>逆位</span>
           <p id="reversedMeaning"></p>
         </div>
-        <p class="interpretation" id="shortInterpretation"></p>
+        <div class="detail-section">
+          <p class="section-label">场景</p>
+          <div class="meaning-block">
+            <span>爱情</span>
+            <p id="loveMeaning"></p>
+          </div>
+          <div class="meaning-block">
+            <span>事业</span>
+            <p id="careerMeaning"></p>
+          </div>
+        </div>
+        <div class="detail-section guidance-section">
+          <p class="section-label">今日指引</p>
+          <p class="interpretation" id="shortInterpretation"></p>
+          <p class="advice" id="adviceMeaning"></p>
+        </div>
       </section>
 
       <button class="reset-button hidden" id="resetButton" type="button">重新洗牌</button>
